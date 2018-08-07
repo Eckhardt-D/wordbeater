@@ -1,28 +1,35 @@
-window.addEventListener('load', init);
-
-// Globals
+window.addEventListener('load', setBestScore);
 
 // Available Levels
 const levels = {
   easy: 5,
   medium: 3,
-  hard: 1
+  hard: 2
 };
 
-// To change level
-const currentLevel = levels.medium;
-
-let time = currentLevel;
 let score = 0;
 let isPlaying;
+let counter;
+let checker;
+let resetButton;
 
 // DOM Elements
 const wordInput = document.querySelector('#word-input');
+const difficultySelector = document.querySelector('#difficultySelector');
 const currentWord = document.querySelector('#current-word');
 const scoreDisplay = document.querySelector('#score');
+const bestScore =document.querySelector('#bestScore');
 const timeDisplay = document.querySelector('#time');
 const message = document.querySelector('#message');
 const seconds = document.querySelector('#seconds');
+
+
+// To change level
+difficultySelector.addEventListener('change', (e) => {
+  currentLevel = levels[e.target.value];
+  document.querySelector('.lead').style.display = 'block';
+  resetMatch();
+});
 
 const words = [
   'hat',
@@ -61,9 +68,9 @@ function init() {
   // Start matching on word input
   wordInput.addEventListener('input', startMatch);
   // Call countdown every second
-  setInterval(countdown, 1000);
+  counter = setInterval(countdown, 1000);
   // Check game status
-  setInterval(checkStatus, 50);
+  checker = setInterval(checkStatus, 50);
 }
 
 // Start match
@@ -73,7 +80,6 @@ function startMatch() {
     time = currentLevel + 1;
     showWord(words);
     wordInput.value = '';
-    score++;
   }
 
   // If score is -1, display 0
@@ -84,13 +90,25 @@ function startMatch() {
   }
 }
 
+function resetMatch() {
+  clearInterval(counter);
+  clearInterval(checker);
+  time = currentLevel;
+  seconds.innerHTML = currentLevel;
+  scoreDisplay.innerHTML = 0;
+  message.innerHTML = '';
+  wordInput.value = '';
+  score = 0;
+  init();
+}
+
 // Match currentWord to wordInput
 function matchWords() {
-  if (wordInput.value === currentWord.innerHTML) {
+  if (wordInput.value === currentWord.innerHTML && time > 0) {
     message.innerHTML = 'Correct!!!';
+    score++;
     return true;
   } else {
-    message.innerHTML = '';
     return false;
   }
 }
@@ -120,7 +138,38 @@ function countdown() {
 // Check game status
 function checkStatus() {
   if (!isPlaying && time === 0) {
-    message.innerHTML = 'Game Over!!!';
+    setBestScore();
+    message.innerHTML = 'Game Over!!!' + 
+    '<br><button class="mt-3" id="resetButton">Restart with the same difficulty</button>';
+    resetButton = document.querySelector('#resetButton');
     score = -1;
+    clearInterval(counter);
+    clearInterval(checker);
+    resetButton.addEventListener('click', resetMatch);
   }
 }
+
+// Set best score
+function setBestScore() {
+  getPreviousBestScore()
+  .then(res => {
+    console.log(score);
+    if (res <= parseInt(scoreDisplay.innerHTML)) {
+      localStorage.setItem('best', JSON.stringify(scoreDisplay.innerHTML));
+      bestScore.innerHTML = scoreDisplay.innerHTML;
+    } else {
+      bestScore.innerHTML = res;
+    }
+  })
+}
+
+// get Best score
+function getPreviousBestScore() {
+  return new Promise((resolve, reject) => {
+    if(localStorage.getItem('best')) {
+      return resolve(JSON.parse(localStorage.getItem('best')));
+    }
+      return resolve(0);
+  })
+}
+
