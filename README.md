@@ -6,7 +6,7 @@
 
 Run index.html in a browser
 
-Try it - [WordBeater Game](https://bradtraversy.github.io/wordbeater)
+Try it - [WordBeater Game](https://kaizenmedia.co.za/games/typing-game)
 
 ## App Info
 
@@ -14,6 +14,8 @@ Try it - [WordBeater Game](https://bradtraversy.github.io/wordbeater)
 
 Brad Traversy
 [Traversy Media](http://www.traversymedia.com)
+Eckhardt Dreyer (Kaizen Media)
+[Eckhardt Dreyer](https://kaizenmedia.co.za/portfolio)
 
 ### Version
 
